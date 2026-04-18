@@ -1,5 +1,5 @@
 {
-  "version": "1.6.7",
+  "version": "1.7",
   "name": "RL Player",
   "description": "Player for icecast stream with support for playlist data from Radiologik",
   "author": "PNCH"

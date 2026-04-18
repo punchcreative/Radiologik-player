@@ -7,7 +7,6 @@ let APP_VERSION,
   DEFAULT_VOLUME,
   THEME_COLOR,
   PLAYLIST,
-  METADATA,
   APP_URL,
   DIM_VOLUME_SLEEP_TIMER,
   fetchIntervalId,
@@ -47,20 +46,10 @@ debugLog.error = (...args) => {
   console.error(...args);
 };
 
-debugLog.info = (...args) => {
-  if (typeof CONFIG !== "undefined" && CONFIG?.DEBUG_MODE === true) {
-    console.info(...args);
-  }
-};
-
-// Helper to check if a string is a Radiologik placeholder
-function isPlaceholderValue(str) {
-  return (
-    !str ||
-    String(str).trim() === "" ||
-    String(str).includes("<rl-") ||
-    String(str).trim() === "-"
-  );
+function isPlaceholderValue(value) {
+  if (value === null || value === undefined) return true;
+  const trimmed = value.toString().trim();
+  return trimmed === "" || trimmed === "-" || trimmed.startsWith("<rl-");
 }
 // SVG Icon helper functions
 function setPlayerIcon(isPlaying) {
@@ -77,17 +66,6 @@ function isPlayerIconPaused() {
   const playerButton = document.getElementById("playerButton");
   return playerButton && playerButton.src.includes("circle-pause.svg");
 }
-
-function isPlayerIconPlaying() {
-  const playerButton = document.getElementById("playerButton");
-  return playerButton && playerButton.src.includes("circle-play.svg");
-}
-
-debugLog.log = (...args) => {
-  if (typeof CONFIG !== "undefined" && CONFIG?.DEBUG_MODE === true) {
-    console.log(...args);
-  }
-};
 
 function showLoader() {
   var nameToSplit = RADIO_NAME || "LOADING";
@@ -171,41 +149,6 @@ function hideLoader() {
   if (loader) loader.remove();
   const player = document.getElementById("player");
   if (player) player.style.display = "";
-}
-
-function showPlaylistFormatErrorNotification(url, error) {
-  const existingNotification = document.getElementById(
-    "playlistFormatErrorNotification",
-  );
-  if (existingNotification) existingNotification.remove();
-
-  const notification = document.createElement("div");
-  notification.id = "playlistFormatErrorNotification";
-  notification.style.position = "fixed";
-  notification.style.top = "20px";
-  notification.style.right = "20px";
-  notification.style.background = "#ff6b35";
-  notification.style.color = "white";
-  notification.style.padding = "16px 20px";
-  notification.style.borderRadius = "8px";
-  notification.style.zIndex = "10000";
-  notification.style.maxWidth = "400px";
-  notification.style.fontSize = "14px";
-  notification.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
-  notification.style.border = "2px solid #ff4444";
-
-  notification.innerHTML = `
-    <div style="font-weight: bold; margin-bottom: 8px; font-size: 16px;">🚨 Playlist Format Error</div>
-    <div style="font-size: 13px; margin-bottom: 8px; line-height: 1.4;">The playlist.json file contains invalid JSON format.</div>
-    <div style="font-size: 11px; margin-top: 10px; text-align: center; border-top: 1px solid rgba(255,255,255,0.5); padding-top: 8px;">Click to dismiss</div>
-  `;
-
-  notification.style.cursor = "pointer";
-  notification.onclick = () => notification.remove();
-  setTimeout(() => {
-    if (notification.parentNode) notification.remove();
-  }, 12000);
-  document.body.appendChild(notification);
 }
 
 function showPlaylistErrorNotification(url, error) {
@@ -332,21 +275,104 @@ async function loadAppVars() {
       APP_NAME = appConfig.name;
       APP_AUTHOR = appConfig.author;
 
-      return fetch("manifest.json");
-    })
-    .then((r) => r.json())
-    .then((manifest) => {
-      const cfg = CONFIG?.APP_CONFIG || manifest.custom_radio_config;
-      RADIO_NAME = cfg.station_name;
-      STREAM_URL = cfg.stream_url;
-      DEFAULT_VOLUME = cfg.default_volume;
-      APP_URL = cfg.app_url;
-      DIM_VOLUME_SLEEP_TIMER = cfg.dim_volume_sleep_timer;
-      PLAYLIST = CONFIG?.PLAYLIST_ENDPOINT || manifest.api_endpoints.playlist;
-      playlistData = PLAYLIST || "playlist.json";
+      // Override with CONFIG values if available, otherwise use manifest defaults
+      if (CONFIG?.APP_CONFIG) {
+        debugLog("Overriding manifest values with CONFIG.APP_CONFIG...");
+        RADIO_NAME =
+          CONFIG.APP_CONFIG.station_name ||
+          manifest.custom_radio_config.station_name;
+        STREAM_URL =
+          CONFIG.APP_CONFIG.stream_url ||
+          manifest.custom_radio_config.stream_url;
+        DEFAULT_VOLUME =
+          CONFIG.APP_CONFIG.default_volume ||
+          manifest.custom_radio_config.default_volume;
+        THEME_COLOR =
+          CONFIG.APP_CONFIG.theme_color ||
+          manifest.custom_radio_config.theme_color;
+        APP_URL =
+          CONFIG.APP_CONFIG.app_url || manifest.custom_radio_config.app_url;
+        DIM_VOLUME_SLEEP_TIMER =
+          CONFIG.APP_CONFIG.dim_volume_sleep_timer ||
+          manifest.custom_radio_config.dim_volume_sleep_timer;
+      } else {
+        debugLog("Using manifest values (CONFIG.APP_CONFIG not found)...");
+        RADIO_NAME = manifest.custom_radio_config.station_name;
+        STREAM_URL = manifest.custom_radio_config.stream_url;
+        DEFAULT_VOLUME = manifest.custom_radio_config.default_volume;
+        THEME_COLOR = manifest.custom_radio_config.theme_color;
+        APP_URL = manifest.custom_radio_config.app_url;
+        DIM_VOLUME_SLEEP_TIMER =
+          manifest.custom_radio_config.dim_volume_sleep_timer;
+      }
 
-      if (STREAM_URL) setStreamingUrl(STREAM_URL);
+      // Ensure APP_URL has a trailing slash for proper URL construction
+      if (APP_URL && !APP_URL.endsWith("/")) {
+        APP_URL = APP_URL + "/";
+        debugLog("Normalized APP_URL to ensure trailing slash:", APP_URL);
+      }
 
+      // Use .env PLAYLIST_ENDPOINT if configured, otherwise fall back to manifest
+      PLAYLIST =
+        CONFIG?.PLAYLIST_ENDPOINT ||
+        manifest.api_endpoints.playlist ||
+        "playlist.json";
+
+      // Set playlistData after PLAYLIST is loaded
+      playlistData = PLAYLIST;
+      debugLog(
+        "Playlist endpoint source:",
+        CONFIG?.PLAYLIST_ENDPOINT
+          ? ".env (VITE_PLAYLIST_ENDPOINT)"
+          : "manifest.json",
+      );
+      debugLog("playlistData set to:", playlistData);
+
+      // Log all key variables to console for debugging
+      debugLog("APP_VERSION:", APP_VERSION);
+      debugLog("APP_NAME:", APP_NAME);
+      debugLog("APP_DESCRIPTION:", APP_DESCRIPTION);
+      debugLog("APP_AUTHOR:", APP_AUTHOR);
+      debugLog("RADIO_NAME:", RADIO_NAME);
+      debugLog("STREAM_URL:", STREAM_URL);
+      debugLog("DEFAULT_VOLUME:", DEFAULT_VOLUME);
+      debugLog("THEME_COLOR:", THEME_COLOR);
+      debugLog("PLAYLIST:", PLAYLIST);
+      debugLog("APP_URL:", APP_URL);
+      debugLog("DIM_VOLUME_SLEEP_TIMER:", DIM_VOLUME_SLEEP_TIMER);
+
+      // Set up streaming URL after loading from manifest
+      if (typeof STREAM_URL === "string" && STREAM_URL.trim() !== "") {
+        setStreamingUrl(STREAM_URL);
+      } else {
+        debugLog.warn(
+          "STREAM_URL is undefined or empty. Skipping setStreamingUrl.",
+        );
+      }
+
+      // Update the loader with the correct radio name if it's currently showing
+      const existingLoader = document.getElementById("radioLoader");
+      if (existingLoader) {
+        const lettersContainer = existingLoader.querySelector(
+          ".radio-loader-letters",
+        );
+        if (lettersContainer) {
+          // Clear existing letters
+          lettersContainer.innerHTML = "";
+
+          // Add new letters with the correct radio name
+          for (let i = 0; i < RADIO_NAME.length; i++) {
+            const span = document.createElement("span");
+            span.textContent = RADIO_NAME[i];
+            span.className = "radio-loader-letter";
+            span.style.opacity = "0";
+            span.style.transition = "opacity 0.5s";
+            lettersContainer.appendChild(span);
+          }
+        }
+      }
+
+      // After loading app variables, check if password protection is enabled
       if (CONFIG?.ENABLE_PASSWORD_PROTECTION === true) {
         checkPassword();
       } else {
@@ -485,12 +511,18 @@ let awaitingNextSong = false;
 async function getStreamingData() {
   try {
     let data = await fetchStreamingData(playlistData);
-    if (data) {
-      if (isFirstLoad) {
-        hideLoader();
-        isFirstLoad = false;
-      }
 
+    debugLog("Received data:", data);
+
+    // Move this outside the "if (data)" block.
+    // This ensures that even if the playlist is offline, the "Loading" overlay disappears
+    // so the user can at least see the player and hit the Play button.
+    if (isFirstLoad) {
+      hideLoader();
+      isFirstLoad = false;
+    }
+
+    if (data) {
       // Reset JSON error retry counter on successful data fetch
       if (jsonErrorRetryCount > 0) {
         debugLog(
@@ -753,22 +785,219 @@ function displayTrackCountdown(song, duration, startTime, nextTrackStarttime) {
 }
 
 async function fetchStreamingData(apiUrl) {
+  let actualUrl = apiUrl; // Declare outside try block to avoid reference errors
   try {
-    const response = await fetch(apiUrl, {
+    debugLog("Attempting to fetch from URL:", apiUrl);
+
+    // Detect if we're running on localhost
+    const isLocalhost =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
+
+    // If we're on localhost and have a relative URL, convert to production URL
+    if (isLocalhost && !apiUrl.startsWith("http")) {
+      // Check if app_url is configured
+      const productionBaseUrl = CONFIG?.APP_CONFIG?.app_url;
+
+      if (
+        !productionBaseUrl ||
+        productionBaseUrl === "https://your-domain.com/app/"
+      ) {
+        debugLog.error("❌ VITE_APP_URL is not configured in .env file");
+        showPlaylistErrorNotification(
+          "Configuration Error",
+          "VITE_APP_URL is not configured. Please set it in your .env file.",
+        );
+        throw new Error("Missing VITE_APP_URL configuration");
+      }
+
+      actualUrl = new URL(apiUrl, productionBaseUrl).href;
+      debugLog(
+        `Localhost detected: Converting relative URL "${apiUrl}" to production URL: ${actualUrl}`,
+      );
+    }
+
+    const isExternalUrl =
+      actualUrl.startsWith("http://") || actualUrl.startsWith("https://");
+
+    let fetchUrl = actualUrl;
+    let usingProxy = false;
+
+    // If we're on localhost and trying to fetch external data, use CORS proxy
+    if (isLocalhost && isExternalUrl && !actualUrl.includes("localhost")) {
+      debugLog("Using CORS proxy for localhost development");
+
+      // For eajt.nl, try the CORS-enabled PHP script first
+      if (
+        actualUrl.includes("eajt.nl") &&
+        actualUrl.includes("playlist.json")
+      ) {
+        const corsProxyUrl = actualUrl.replace(
+          "playlist.json",
+          "cors-playlist.php",
+        );
+        debugLog("Trying CORS-enabled playlist proxy:", corsProxyUrl);
+
+        try {
+          fetchUrl = corsProxyUrl;
+          const response = await fetch(fetchUrl, {
+            method: "GET",
+            headers: {
+              "Cache-Control": "no-cache",
+            },
+          });
+
+          if (response.ok) {
+            debugLog("Successfully using cors-playlist.php");
+            const text = await response.text();
+            debugLog("CORS proxy response length:", text.length);
+            debugLog("Raw response (first 100 chars):", text.substring(0, 100));
+
+            const data = JSON.parse(text);
+            debugLog(
+              "Successfully fetched and parsed streaming data via CORS proxy",
+            );
+            return data;
+          } else {
+            debugLog.warn(
+              "cors-playlist.php failed, falling back to generic CORS proxy",
+            );
+            throw new Error(`CORS proxy failed: ${response.status}`);
+          }
+        } catch (corsError) {
+          debugLog.warn(
+            "CORS proxy failed, trying generic proxies:",
+            corsError.message,
+          );
+        }
+      }
+
+      // Try multiple generic CORS proxy services for better reliability
+      const corsProxies = [
+        `https://api.allorigins.win/get?url=${encodeURIComponent(actualUrl)}`,
+        `https://corsproxy.io/?${encodeURIComponent(actualUrl)}`,
+        `https://cors-anywhere.herokuapp.com/${actualUrl}`,
+      ];
+
+      // Try each proxy until one works
+      for (let i = 0; i < corsProxies.length; i++) {
+        try {
+          fetchUrl = corsProxies[i];
+          usingProxy = true;
+          debugLog(`Trying CORS proxy ${i + 1}:`, fetchUrl);
+          break;
+        } catch (error) {
+          debugLog.warn(`CORS proxy ${i + 1} failed, trying next...`);
+          if (i === corsProxies.length - 1) {
+            throw error;
+          }
+        }
+      }
+    }
+
+    // Fetch the data (either direct or via generic CORS proxy)
+    const response = await fetch(fetchUrl, {
       method: "GET",
-      headers: { "Cache-Control": "no-cache" },
+      headers: {
+        "Cache-Control": "no-cache",
+      },
     });
-    if (!response.ok) throw new Error("Fetch failed");
-    return await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        `Error fetching playlist: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    debugLog("Response status:", response.status);
+    debugLog("Response content-type:", response.headers.get("content-type"));
+
+    // Get the raw text first to inspect it
+    const text = await response.text();
+
+    // If we used generic CORS proxy, extract the actual content
+    let actualText = text;
+    if (usingProxy) {
+      try {
+        // Handle different proxy response formats
+        if (fetchUrl.includes("allorigins.win")) {
+          const proxyResponse = JSON.parse(text);
+          actualText = proxyResponse.contents;
+          debugLog("Extracted content from allorigins.win proxy");
+        } else if (fetchUrl.includes("corsproxy.io")) {
+          // corsproxy.io returns the content directly
+          actualText = text;
+          debugLog("Using content from corsproxy.io proxy");
+        } else if (fetchUrl.includes("cors-anywhere")) {
+          // cors-anywhere returns the content directly
+          actualText = text;
+          debugLog("Using content from cors-anywhere proxy");
+        } else {
+          // Fallback: try to parse as proxy response, otherwise use raw
+          try {
+            const proxyResponse = JSON.parse(text);
+            actualText = proxyResponse.contents || proxyResponse.data || text;
+          } catch {
+            actualText = text;
+          }
+          debugLog("Extracted content from generic CORS proxy");
+        }
+      } catch (error) {
+        debugLog.warn("Failed to parse CORS proxy response, using raw text");
+        actualText = text;
+      }
+    } else {
+      // Direct fetch or CORS-enabled PHP script
+      actualText = text;
+    }
+
+    debugLog("Raw response length:", actualText.length);
+    debugLog("Raw response (first 100 chars):", actualText.substring(0, 100));
+    debugLog(
+      "Raw response (last 100 chars):",
+      actualText.substring(actualText.length - 100),
+    );
+
+    // Try to parse the JSON
+    const data = JSON.parse(actualText);
+    debugLog("Successfully fetched and parsed streaming data");
+    return data;
   } catch (error) {
-    return null;
+    console.error("fetchStreamingData error:", error);
+    console.error("Failed URL:", actualUrl || apiUrl);
+
+    // Log error but continue polling - playlist data will be fetched when available
+    debugLog.warn(
+      "Playlist fetch failed, will retry on next poll:",
+      error.message,
+    );
+
+    if (error instanceof SyntaxError) {
+      console.error(
+        "JSON parsing failed - the playlist.json file appears to be malformed or truncated",
+      );
+    }
+
+    // Re-throw so getStreamingData's catch block can trigger the UI notification
+    throw error;
   }
 }
 
 function setCopyright() {
-  const copy = document.getElementById("copy");
-  if (copy)
-    copy.textContent = `${APP_NAME} ${APP_VERSION} | ©${new Date().getFullYear()} ${APP_AUTHOR}`;
+  var appVersion = APP_VERSION;
+  var appName = APP_NAME;
+  var appAuthor = APP_AUTHOR;
+
+  var copy = document.getElementById("copy");
+  let jaar = new Date().getFullYear();
+  copy.textContent =
+    appName + " " + appVersion + " | ©" + jaar + " " + appAuthor;
+
+  const versionInfo = document.getElementById("version-info");
+  if (versionInfo) {
+    versionInfo.textContent = `v${appVersion}`;
+  }
+
   setupAudioPlayer();
 }
 
@@ -801,8 +1030,63 @@ function setupAudioEventListeners() {
 
   audio.addEventListener("play", () => {
     setPlayerIcon(true);
-    const btn = document.getElementById("playerButton");
-    if (btn) btn.style.textShadow = "none";
+    // You might also want to remove the text shadow here
+    const playerButton = document.getElementById("playerButton");
+    if (playerButton) {
+      playerButton.style.textShadow = "none";
+    }
+    retryCount = 0;
+    suspendCount = 0;
+    if (retryTimer) {
+      clearTimeout(retryTimer);
+      retryTimer = null;
+    }
+    if (bufferingTimeout) {
+      clearTimeout(bufferingTimeout);
+      bufferingTimeout = null;
+    }
+    startHealthCheck(); // Start monitoring stream health
+  });
+
+  // Monitor buffering state with shorter timeout for faster recovery
+  audio.addEventListener("waiting", () => {
+    debugLog.log("Stream buffering...");
+    // Only set timeout if not already buffering
+    if (bufferingTimeout) clearTimeout(bufferingTimeout);
+    bufferingTimeout = setTimeout(() => {
+      // Only attempt recovery if still buffering and not paused by user
+      if (audio.readyState < 3 && !audio.paused) {
+        debugLog.warn("Buffering timeout - stream may be having issues");
+        handleStreamError("buffering timeout");
+      }
+    }, 15000); // Increased to 15 seconds to avoid false positives
+  });
+
+  audio.addEventListener("canplaythrough", () => {
+    debugLog.log("Stream ready to play through");
+    if (bufferingTimeout) {
+      clearTimeout(bufferingTimeout);
+      bufferingTimeout = null;
+    }
+  });
+
+  // Button state is now managed by togglePlay() function only
+  // Removed onplay and onpause handlers to prevent race conditions
+
+  // The 'playing' event is triggered when playback has begun, while 'play' is triggered when the request to play is initiated. 'play' is a more reliable event to use for updating the button state.
+  audio.addEventListener("playing", () => {
+    debugLog.log("Stream playing successfully");
+    retryCount = 0;
+    suspendCount = 0; // Reset suspend counter when playing successfully
+    if (retryTimer) {
+      clearTimeout(retryTimer);
+      retryTimer = null;
+    }
+    if (bufferingTimeout) {
+      clearTimeout(bufferingTimeout);
+      bufferingTimeout = null;
+    }
+    startHealthCheck(); // Start monitoring stream health
   });
 }
 
@@ -829,9 +1113,13 @@ function intToDecimal(vol) {
   return vol / 100;
 }
 
-function initNightshift() {
-  const night = document.getElementById("nightshift");
-  if (!night) return;
+// Nightshift / lightmode toggle
+// Clicking the #nightshift image will toggle the class 'lightmode' on the <body>
+// The choice is persisted in localStorage under key 'rl_lightmode'
+(function () {
+  function initNightshift() {
+    const night = document.getElementById("nightshift");
+    if (!night) return;
 
   const pref = localStorage.getItem("rl_lightmode");
   if (pref === "1") {
