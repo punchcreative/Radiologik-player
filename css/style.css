@@ -175,23 +175,60 @@ body.lightmode .web-player {
 
 .current-song {
   font-size: 1.2em;
-  line-height: 0.8em;
   text-transform: uppercase;
   font-weight: 200;
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 
 .current-artist {
   font-size: 1.1em;
   font-weight: 700;
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 
 .current-song,
 .current-artist {
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
   /* overflow: hidden; */
   text-overflow: ellipsis;
+}
+
+/* 1. Voorkom dat het scrollen de pagina in de breedte oprekt */
+#currentTrackContainer {
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 2. De scroll-animatie met geforceerde breedte */
+.scroll-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  width: max-content !important; /* DIT IS DE FIX: Zorgt dat het blok exact zo breed is als de tekst */
+  padding-right: 20px; /* Een klein beetje buffer aan het einde */
+  text-align: left !important;
+  animation: marquee 16s linear infinite; /* Iets verlengd voor een rustigere loop */
+}
+
+/* 3. De vernieuwde keyframes */
+@keyframes marquee {
+  0%,
+  15% {
+    transform: translateX(0); /* Start in beeld en pauzeer even */
+  }
+  45% {
+    transform: translateX(
+      -100%
+    ); /* Schuift nu de HELE tekstlengte naar links uit beeld */
+  }
+  46% {
+    transform: translateX(
+      100vw
+    ); /* Springt onzichtbaar naar de rechterkant van het scherm */
+  }
+  85%,
+  100% {
+    transform: translateX(
+      0
+    ); /* Schuift weer in tot de startpositie en pauzeert */
+  }
 }
 
 .play-pause #playerButton {
@@ -203,8 +240,8 @@ body.lightmode .play-pause #playerButton {
 }
 /* SVG Icon styles replacing FontAwesome */
 .player-icon {
-  width: 48px;
-  height: 48px;
+  width: 80px;
+  height: 80px;
   filter: brightness(0) invert(1); /* Makes SVG white */
   cursor: pointer;
   transition: opacity 0.3s ease;
@@ -336,7 +373,6 @@ footer {
   font-size: 0.75em;
   font-weight: 200;
   margin: 0.1em 0;
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 .historic,
 .toplay {
@@ -344,7 +380,6 @@ footer {
   font-size: 0.75em;
   font-weight: 200;
   margin: 0.1em 0;
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 body.lightmode .historic,
 body.lightmode .toplay {
@@ -364,14 +399,12 @@ body.lightmode .toplay {
 .toplay .music-info {
   color: var(--modal-text);
   font-weight: 200;
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 
 .historic .music-info,
 .toplay .music-info {
   color: var(--modal-text);
   font-weight: 200;
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 body.lightmode .historic .music-info,
 body.lightmode .toplay .music-info {
@@ -386,7 +419,6 @@ body.lightmode .toplay .music-info {
   font-weight: 200;
   /* font-size: 0.8em; */
   color: var(--modal-text);
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 
 .historic .music-info .song,
@@ -397,7 +429,6 @@ body.lightmode .toplay .music-info {
   font-weight: 200;
   /* font-size: 0.8em; */
   color: white;
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 body.lightmode .historic .music-info .song,
 body.lightmode .toplay .music-info .song {
@@ -490,11 +521,6 @@ body.lightmode .toplay .music-info .song {
   .logo img {
     max-width: 300px;
     margin: 65px 0;
-  }
-
-  .info-current-song {
-    margin-top: 20px;
-    text-align: left;
   }
 
   .play-pause #playerButton {

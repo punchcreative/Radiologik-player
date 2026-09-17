@@ -590,6 +590,13 @@ function refreshCurrentSong(
       currentSong.textContent = song;
       currentArtist.textContent = artist;
 
+      // Check title length and toggle the marquee class
+      if (song.length > 25) {
+        currentSong.classList.add("scroll-marquee");
+      } else {
+        currentSong.classList.remove("scroll-marquee");
+      }
+
       displayTrackCountdown(song, duration, startTime, nextTrackStarttime);
 
       currentSong.classList.remove("fade-out");
@@ -656,13 +663,6 @@ async function getStreamingData() {
       const currentArtistVal = data.Current.Artist;
       let currentDurationVal = data.Current.Duration;
       let currentStartTime = data.Current.Starttime;
-
-      if (currentSong.length > charsPlayingTitle) {
-        var string = currentSong;
-        var length = charsPlayingTitle;
-        var trimmedString = string.substring(0, length) + "...";
-        currentSong = trimmedString;
-      }
 
       const safeCurrentSong = (currentSong || "")
         .replace(/'/g, "'")
