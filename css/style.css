@@ -22,7 +22,9 @@
   font-optical-sizing: auto;
   font-weight: 200;
   font-style: normal;
-  font-variation-settings: "wdth" 100, "YTLC" 500;
+  font-variation-settings:
+    "wdth" 100,
+    "YTLC" 500;
 }
 
 .nunito-sans-bold {
@@ -30,7 +32,9 @@
   font-optical-sizing: auto;
   font-weight: 700;
   font-style: normal;
-  font-variation-settings: "wdth" 100, "YTLC" 500;
+  font-variation-settings:
+    "wdth" 100,
+    "YTLC" 500;
 }
 
 html,
@@ -65,7 +69,10 @@ body,
 .web-player,
 #bgCover,
 .bg-mask {
-  transition: background-color 0.25s ease, color 0.25s ease, filter 0.25s ease;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    filter 0.25s ease;
 }
 #page-container {
   position: relative;
@@ -167,24 +174,61 @@ body.lightmode .web-player {
 }
 
 .current-song {
-  font-size: 1.4em;
-  line-height: 1em;
+  font-size: 1.2em;
   text-transform: uppercase;
   font-weight: 200;
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 
 .current-artist {
-  font-size: 1.2em;
+  font-size: 1.1em;
   font-weight: 700;
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 
 .current-song,
 .current-artist {
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
   /* overflow: hidden; */
   text-overflow: ellipsis;
+}
+
+/* 1. Voorkom dat het scrollen de pagina in de breedte oprekt */
+#currentTrackContainer {
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 2. De scroll-animatie met geforceerde breedte */
+.scroll-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  width: max-content !important; /* DIT IS DE FIX: Zorgt dat het blok exact zo breed is als de tekst */
+  padding-right: 20px; /* Een klein beetje buffer aan het einde */
+  text-align: left !important;
+  animation: marquee 16s linear infinite; /* Iets verlengd voor een rustigere loop */
+}
+
+/* 3. De vernieuwde keyframes */
+@keyframes marquee {
+  0%,
+  15% {
+    transform: translateX(0); /* Start in beeld en pauzeer even */
+  }
+  45% {
+    transform: translateX(
+      -100%
+    ); /* Schuift nu de HELE tekstlengte naar links uit beeld */
+  }
+  46% {
+    transform: translateX(
+      100vw
+    ); /* Springt onzichtbaar naar de rechterkant van het scherm */
+  }
+  85%,
+  100% {
+    transform: translateX(
+      0
+    ); /* Schuift weer in tot de startpositie en pauzeert */
+  }
 }
 
 .play-pause #playerButton {
@@ -194,36 +238,10 @@ body.lightmode .web-player {
 body.lightmode .play-pause #playerButton {
   color: var(--text-dark) !important;
 }
-.play-pause #timerButton {
-  padding-top: 0.1em;
-  color: var(--modal-text);
-  line-height: 1;
-  cursor: pointer;
-}
-body.lightmode .play-pause #timerButton {
-  color: rgb(3, 21, 33) !;
-}
-.play-pause .timer-display {
-  line-height: 1;
-  vertical-align: middle;
-}
-.play-pause #timerDisplay {
-  font-size: 0.8em;
-  color: rgba(255, 255, 255, 0.636);
-  vertical-align: middle;
-}
-.play-pause #timerDisplay {
-  font-size: 0.8em;
-  color: rgba(255, 255, 255, 0.636);
-  vertical-align: middle;
-}
-body.lightmode .play-pause #timerDisplay {
-  color: rgba(0, 0, 0, 0.636);
-}
 /* SVG Icon styles replacing FontAwesome */
 .player-icon {
-  width: 48px;
-  height: 48px;
+  width: 80px;
+  height: 80px;
   filter: brightness(0) invert(1); /* Makes SVG white */
   cursor: pointer;
   transition: opacity 0.3s ease;
@@ -247,20 +265,7 @@ body.lightmode .bulb .nightshift-icon {
   filter: brightness(1) invert(0); /* Makes SVG dark */
 }
 
-.timer-icon {
-  width: 25px;
-  filter: brightness(0) invert(1); /* Makes SVG white */
-  cursor: pointer;
-  transition: opacity 0.3s ease;
-  vertical-align: middle;
-}
-
-body.lightmode .timer-icon {
-  filter: brightness(1) invert(0) !important; /* Makes SVG dark */
-}
-
-.player-icon:hover,
-.timer-icon:hover {
+.player-icon:hover {
   opacity: 0.8;
 }
 
@@ -368,7 +373,6 @@ footer {
   font-size: 0.75em;
   font-weight: 200;
   margin: 0.1em 0;
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 .historic,
 .toplay {
@@ -376,7 +380,6 @@ footer {
   font-size: 0.75em;
   font-weight: 200;
   margin: 0.1em 0;
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 body.lightmode .historic,
 body.lightmode .toplay {
@@ -396,14 +399,12 @@ body.lightmode .toplay {
 .toplay .music-info {
   color: var(--modal-text);
   font-weight: 200;
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 
 .historic .music-info,
 .toplay .music-info {
   color: var(--modal-text);
   font-weight: 200;
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 body.lightmode .historic .music-info,
 body.lightmode .toplay .music-info {
@@ -418,7 +419,6 @@ body.lightmode .toplay .music-info {
   font-weight: 200;
   /* font-size: 0.8em; */
   color: var(--modal-text);
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 
 .historic .music-info .song,
@@ -429,7 +429,6 @@ body.lightmode .toplay .music-info {
   font-weight: 200;
   /* font-size: 0.8em; */
   color: white;
-  /* text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); */
 }
 body.lightmode .historic .music-info .song,
 body.lightmode .toplay .music-info .song {
@@ -437,37 +436,37 @@ body.lightmode .toplay .music-info .song {
 }
 
 #toplaySong .text-size-0 {
-  font-size: 0.8em;
+  font-size: 0.6em;
   opacity: 0.4;
 }
 #toplaySong .text-size-1 {
-  font-size: 0.9em;
-  opacity: 0.5;
+  font-size: 0.7em;
+  opacity: 0.6;
 }
 #toplaySong .text-size-2 {
-  font-size: 1em;
+  font-size: 0.8em;
   opacity: 0.6;
 }
 #toplaySong .text-size-3 {
-  font-size: 1.1em;
-  opacity: 0.8;
+  font-size: 0.9em;
+  opacity: 0.7;
 }
 #toplaySong .text-size-4 {
-  font-size: 1.2em;
-  opacity: 1;
+  font-size: 1em;
+  opacity: 0.8;
 }
 
 #historicSong .text-size-0 {
   font-size: 1em;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 #historicSong .text-size-1 {
   font-size: 0.9em;
-  opacity: 0.5;
+  opacity: 0.6;
 }
 #historicSong .text-size-2 {
   font-size: 0.8em;
-  opacity: 0.3;
+  opacity: 0.4;
 }
 
 @media (max-width: 370px) {
@@ -522,11 +521,6 @@ body.lightmode .toplay .music-info .song {
   .logo img {
     max-width: 300px;
     margin: 65px 0;
-  }
-
-  .info-current-song {
-    margin-top: 20px;
-    text-align: left;
   }
 
   .play-pause #playerButton {

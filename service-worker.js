@@ -1,4 +1,4 @@
-const activeCacheVersion = 1700;
+const activeCacheVersion = 1711;
 const activeCacheName = `rlplayer-${activeCacheVersion}`;
 
 console.log(`Service Worker: Using cache version ${activeCacheVersion}`);
@@ -21,9 +21,9 @@ const cacheAssets = [
   "img/cover.png",
   "img/app-icon.png",
   "manifest.json",
+  "app.json",
   "assets/icons/circle-play.svg",
   "assets/icons/circle-pause.svg",
-  "assets/icons/timer.svg",
 ];
 
 // Service workers can't directly listen for FTP uploads or external file changes.
@@ -148,11 +148,31 @@ self.addEventListener("fetch", (event) => {
   if (
     event.request.mode === "navigate" ||
     event.request.destination === "script" ||
+    event.request.url.endsWith("app.json") || // Ensure app.json is always network-first
     event.request.url.includes(".js") ||
     event.request.destination === "document"
   ) {
     event.respondWith(
       caches.open(activeCacheName).then(async (cache) => {
+        // For app.json, always go to the network first to ensure the version is fresh.
+        if (event.request.url.endsWith("app.json")) {
+          try {
+            const networkResponse = await fetch(event.request, {
+              cache: "no-store",
+            });
+            if (networkResponse.ok) {
+              cache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          } catch (error) {
+            console.warn(
+              "Service Worker: Network failed for app.json, serving from cache.",
+            );
+            return await cache.match(event.request);
+          }
+        }
+
+        // For other scripts and documents, use the existing Network-First strategy.
         try {
           const networkResponse = await fetch(event.request);
           if (networkResponse.ok) {
@@ -196,6 +216,7 @@ self.addEventListener("install", (event) => {
         "img/app-icon.png",
         "img/cover.png",
         "manifest.json",
+        "app.json",
       ];
 
       console.log("Service Worker: Caching critical assets...");
@@ -210,8 +231,17 @@ self.addEventListener("install", (event) => {
     }),
   );
 
-  // Don't force immediate activation - let it happen naturally
-  console.log("Service Worker: Installation complete");
+  // Force the waiting service worker to become the active service worker.
+  self.skipWaiting();
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    console.log(
+      "Service Worker: Received 'SKIP_WAITING' message, activating new worker.",
+    );
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("activate", (event) => {
@@ -237,6 +267,7 @@ self.addEventListener("activate", (event) => {
       })
       .then(() => {
         console.log("Service Worker: Activation complete, taking control");
+        // Tell all clients that a new version is available and they should reload
         return self.clients.claim();
       }),
   );

@@ -59,7 +59,10 @@
                   </div>
                   <div class="row">
                     <div class="col-12">
-                      <div id="currentTrackContainer" class="info-current-song text-center">
+                      <div
+                        id="currentTrackContainer"
+                        class="info-current-song text-center"
+                      >
                         <p
                           id="currentSongDisplay"
                           class="current-song text-uppercase"
@@ -78,7 +81,7 @@
                       </div>
                     </div>
                     <div
-                      class="col-12 play-pause text-center mb-3 d-flex flex-column align-items-center"
+                      class="col-12 play-pause text-center mb-1 d-flex flex-column align-items-center"
                     >
                       <!-- Player & Timer Controls -->
                       <div class="mb-1 mb-lg-3">
@@ -86,19 +89,8 @@
                           id="playerButton"
                           src="assets/icons/circle-play.svg"
                           alt="Play"
-                          class="player-icon mb-3"
+                          class="player-icon"
                         />
-                        <div
-                          class="d-flex align-items-center justify-content-center"
-                        >
-                          <img
-                            id="timerButton"
-                            src="assets/icons/timer.svg"
-                            alt="Timer"
-                            class="timer-icon"
-                          />
-                          <span id="timerDisplay" class="timer-display"></span>
-                        </div>
                       </div>
 
                       <!-- Volume Controls -->
@@ -127,27 +119,27 @@
                     style="display: none"
                   >
                     <div class="col-12">
-                      <h5
+                      <!-- <h5
                         class="section-title text-center text-uppercase small muted"
                       >
                         Upcoming
-                      </h5>
+                      </h5> -->
                       <div id="nextList" class="track-list"></div>
                     </div>
                   </div>
                   <!-- History Section -->
                   <div
                     id="historySection"
-                    class="row historic mt-3"
+                    class="row historic mt-1"
                     style="display: none"
                   >
                     <div class="col-12">
-                      <h5
+                      <!-- <h5
                         class="section-title text-center text-uppercase small muted"
                       >
                         Recently Played
-                      </h5>
-                      <div id="historyList" class="track-list"></div>
+                      </h5> -->
+                      <div id="historicSong" class="track-list"></div>
                     </div>
                   </div>
                 </div>
@@ -182,17 +174,17 @@
         </div>
       </footer>
     </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" defer></script>
     <script
-      type="text/javascript"
-      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      src="https://cdn.jsdelivr.net/npm/jquery.marquee@1.6.0/jquery.marquee.min.js"
+      defer
     ></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery.marquee@1.6.0/jquery.marquee.min.js"></script>
     <script
-      type="text/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+      defer
     ></script>
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/env-loader.js"></script>
-    <script type="text/javascript" src="js/script.js" defer></script>
+    <script src="js/bootstrap.min.js" defer></script>
+    <script src="js/env-loader.js" defer></script>
+    <script src="js/script.js" defer></script>
   </body>
 </html>

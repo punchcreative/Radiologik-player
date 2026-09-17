@@ -88,13 +88,13 @@ class EnvLoader {
     return {
       PASSWORD_HASH: this.get(
         "VITE_PASSWORD_HASH",
-        "default-hash-please-configure"
+        "default-hash-please-configure",
       ),
 
       // Security Settings
       ENABLE_PASSWORD_PROTECTION: this.getBool(
         "VITE_ENABLE_PASSWORD_PROTECTION",
-        false
+        false,
       ),
 
       APP_CONFIG: {
@@ -110,15 +110,11 @@ class EnvLoader {
 
         // Audio Settings
         default_volume: this.getNumber("VITE_DEFAULT_VOLUME", 100),
-        dim_volume_sleep_timer: this.getNumber(
-          "VITE_DIM_VOLUME_SLEEP_TIMER",
-          50
-        ),
 
         // Timing Settings
         countdown_buffer_seconds: this.getNumber(
           "VITE_COUNTDOWN_BUFFER_SECONDS",
-          8
+          8,
         ),
       },
 
@@ -138,7 +134,7 @@ class EnvLoader {
     }
 
     const missing = required.filter(
-      (key) => !this.get(key) || this.get(key).includes("your-")
+      (key) => !this.get(key) || this.get(key).includes("your-"),
     );
 
     if (missing.length > 0) {
