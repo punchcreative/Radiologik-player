@@ -1,4 +1,4 @@
-const activeCacheVersion = 1711;
+const activeCacheVersion = 1713;
 const activeCacheName = `rlplayer-${activeCacheVersion}`;
 
 console.log(`Service Worker: Using cache version ${activeCacheVersion}`);
@@ -10,11 +10,6 @@ const cacheAssets = [
   "offline.html",
   "css/style.css",
   "css/bootstrap.min.css",
-  "css/fontawesome.min.css",
-  "css/regular.min.css",
-  "css/solid.min.css",
-  "css/thin.min.css",
-  "css/animate.css",
   "js/script.js",
   "js/bootstrap.min.js",
   "js/env-loader.js",
