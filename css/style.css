@@ -197,37 +197,25 @@ body.lightmode .web-player {
   box-sizing: border-box;
 }
 
-/* 2. De scroll-animatie met geforceerde breedte */
-.scroll-marquee {
-  display: inline-block;
+.marquee-container {
+  overflow: hidden;
   white-space: nowrap;
-  width: max-content !important; /* DIT IS DE FIX: Zorgt dat het blok exact zo breed is als de tekst */
-  padding-right: 20px; /* Een klein beetje buffer aan het einde */
-  text-align: left !important;
-  animation: marquee 16s linear infinite; /* Iets verlengd voor een rustigere loop */
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* 3. De vernieuwde keyframes */
-@keyframes marquee {
-  0%,
-  15% {
-    transform: translateX(0); /* Start in beeld en pauzeer even */
+.marquee-content {
+  display: inline-block;
+  padding-left: 100%; /* Zorgt dat de tekst rechts buiten het venster start */
+  animation: smoothMarquee 12s linear infinite; /* Pas de 12s aan voor snelheid */
+}
+
+@keyframes smoothMarquee {
+  0% {
+    transform: translate(0, 0);
   }
-  45% {
-    transform: translateX(
-      -100%
-    ); /* Schuift nu de HELE tekstlengte naar links uit beeld */
-  }
-  46% {
-    transform: translateX(
-      100vw
-    ); /* Springt onzichtbaar naar de rechterkant van het scherm */
-  }
-  85%,
   100% {
-    transform: translateX(
-      0
-    ); /* Schuift weer in tot de startpositie en pauzeert */
+    transform: translate(-100%, 0); /* Schuift volledig door naar links */
   }
 }
 

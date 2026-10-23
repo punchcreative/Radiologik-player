@@ -590,11 +590,13 @@ function refreshCurrentSong(
       currentSong.textContent = song;
       currentArtist.textContent = artist;
 
-      // Check title length and toggle the marquee class
+      // Check title length and apply structural marquee wrapper
       if (song.length > 25) {
-        currentSong.classList.add("scroll-marquee");
+        currentSong.innerHTML = `<span class="marquee-content">${song}</span>`;
+        currentSong.classList.add("marquee-container");
       } else {
-        currentSong.classList.remove("scroll-marquee");
+        currentSong.textContent = song;
+        currentSong.classList.remove("marquee-container");
       }
 
       displayTrackCountdown(song, duration, startTime, nextTrackStarttime);
