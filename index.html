@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>RL Player</title>
     <link rel="icon" type="image/png" href="img/app-icon.png" />
-    <!-- <link rel="stylesheet" type="text/css" href="css/animate.css" /> -->
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="manifest" href="manifest.json" />
 
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="msapplication-starturl" content="./" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
@@ -118,11 +117,6 @@
                     style="display: none"
                   >
                     <div class="col-12">
-                      <!-- <h5
-                        class="section-title text-center text-uppercase small muted"
-                      >
-                        Upcoming
-                      </h5> -->
                       <div id="nextList" class="track-list"></div>
                     </div>
                   </div>
@@ -133,11 +127,6 @@
                     style="display: none"
                   >
                     <div class="col-12">
-                      <!-- <h5
-                        class="section-title text-center text-uppercase small muted"
-                      >
-                        Recently Played
-                      </h5> -->
                       <div id="historicSong" class="track-list"></div>
                     </div>
                   </div>
@@ -150,12 +139,12 @@
         <div class="container bulb w-auto">
           <div class="row d-flex justify-content-center">
             <div class="text-center col-12">
-              <span class="nightshift d-inline ml-1">
+              <span class="nightshift d-inline ms-1">
                 <img
                   id="nightshift"
                   src="assets/icons/lightbulb-light.svg"
                   alt="Night Shift"
-                  class="nightshift-icon ml-2"
+                  class="nightshift-icon ms-2"
                 />
               </span>
             </div>
@@ -167,22 +156,12 @@
           <div class="row d-flex justify-content-center">
             <div class="text-center col-12">
               <p id="copy" class="copyright d-inline"></p>
-              <!-- <span id="version-info" class="text-muted small ms-2"></span> -->
             </div>
           </div>
         </div>
       </footer>
     </div>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js" defer></script>
-    <!-- <script
-      src="https://cdn.jsdelivr.net/npm/jquery.marquee@1.6.0/jquery.marquee.min.js"
-      defer
-    ></script> -->
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
-      defer
-    ></script>
-    <script src="js/bootstrap.min.js" defer></script>
+    <script src="js/bootstrap.bundle.min.js" defer></script>
     <script src="js/env-loader.js" defer></script>
     <script src="js/script.js" defer></script>
   </body>

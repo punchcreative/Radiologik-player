@@ -929,14 +929,14 @@ function displayTrackCountdown(song, duration, startTime, nextTrackStarttime) {
         currentDurationElem.style.opacity = "0.8";
         currentDurationElem.style.color = "#ffd700";
       } else {
-        currentDurationElem.style.opacity = "1";
+        currentDurationElem.style.opacity = "0,8";
         currentDurationElem.style.color = "";
       }
 
       if (remaining === 0 && !awaitingNextSong) {
         awaitingNextSong = true;
         currentDurationElem.textContent = "Next song...";
-        currentDurationElem.style.opacity = "0.7";
+        currentDurationElem.style.opacity = "0.8";
         currentDurationElem.style.color = "";
         currentDurationElem.style.animation = "pulse 1.5s ease-in-out infinite";
 
@@ -952,14 +952,14 @@ function displayTrackCountdown(song, duration, startTime, nextTrackStarttime) {
           if (awaitingNextSong) {
             awaitingNextSong = false;
             currentDurationElem.textContent = "0:00";
-            currentDurationElem.style.opacity = "1";
+            currentDurationElem.style.opacity = "0.8";
             currentDurationElem.style.animation = "";
             getStreamingData();
           }
         }, 15000);
       } else if (remaining > 0) {
         currentDurationElem.textContent = `${min}:${sec.toString().padStart(2, "0")}`;
-        currentDurationElem.style.opacity = "1";
+        currentDurationElem.style.opacity = "0.8";
         currentDurationElem.style.animation = "";
       }
     }

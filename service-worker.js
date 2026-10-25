@@ -1,4 +1,4 @@
-const activeCacheVersion = 1713;
+const activeCacheVersion = 1800;
 const activeCacheName = `rlplayer-${activeCacheVersion}`;
 
 console.log(`Service Worker: Using cache version ${activeCacheVersion}`);
@@ -11,7 +11,7 @@ const cacheAssets = [
   "css/style.css",
   "css/bootstrap.min.css",
   "js/script.js",
-  "js/bootstrap.min.js",
+  "js/bootstrap.bundle.min.js",
   "js/env-loader.js",
   "img/cover.png",
   "img/app-icon.png",
@@ -19,6 +19,8 @@ const cacheAssets = [
   "app.json",
   "assets/icons/circle-play.svg",
   "assets/icons/circle-pause.svg",
+  "assets/fonts/nunito-v32-latin-200.woff2",
+  "assets/fonts/nunito-v32-latin-700.woff2",
 ];
 
 // Service workers can't directly listen for FTP uploads or external file changes.
