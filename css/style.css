@@ -1,8 +1,21 @@
 @charset "UTF-8";
 
-@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200;1,6..12,200&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,700;1,6..12,700&display=swap");
-@import url("bootstrap.min.css");
+/* nunito-200 - latin */
+@font-face {
+  font-display: swap;
+  font-family: "Nunito";
+  font-style: normal;
+  font-weight: 200;
+  src: url("..assets/fonts/nunito-v32-latin-200.woff2") format("woff2");
+}
+/* nunito-700 - latin */
+@font-face {
+  font-display: swap;
+  font-family: "Nunito";
+  font-style: normal;
+  font-weight: 700;
+  src: url("..assets/fonts/nunito-v32-latin-700.woff2") format("woff2");
+}
 
 :root {
   --track-dark: #3b3b3b;
@@ -201,24 +214,40 @@ body.lightmode .web-player {
   overflow: hidden;
   white-space: nowrap;
   width: 100%;
-  box-sizing: border-box;
+  container-type: inline-size;
+  /* Zorgt voor een zachte fade-in en fade-out aan de randen */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 5%,
+    black 95%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 5%,
+    black 95%,
+    transparent 100%
+  );
 }
 
 .marquee-content {
   display: inline-block;
-  padding-left: 100%; /* Zorgt dat de tekst rechts buiten het venster start */
-  animation: smoothMarquee 12s linear infinite; /* Pas de 12s aan voor snelheid */
+  white-space: nowrap;
+  animation: smoothMarquee 15s linear infinite;
 }
 
 @keyframes smoothMarquee {
   0% {
-    transform: translate(0, 0);
+    /* 100cqw = 100% van de Container Query Width (start exact aan de rand van de speler) */
+    transform: translateX(100cqw);
   }
   100% {
-    transform: translate(-100%, 0); /* Schuift volledig door naar links */
+    /* -100% = de eigen breedte van de tekst (zodat hij volledig links uit beeld loopt) */
+    transform: translateX(-100%);
   }
 }
-
 .play-pause #playerButton {
   font-size: 2.5rem;
   color: var(--modal-text);
@@ -346,6 +375,10 @@ footer {
   margin-top: 1em;
 }
 
+.current-artist {
+  opacity: 0.8;
+}
+
 .playlist-part.current-title,
 .playlist-part.historic-title {
   border-top: 1px solid #fff;
@@ -355,6 +388,13 @@ footer {
   border-bottom: 1px solid #fff;
 }
 
+.toplay {
+  opacity: 0.7;
+}
+.historic,
+.current-duration {
+  opacity: 0.5;
+}
 .historic,
 .toplay {
   color: #e4e4e4;
@@ -372,9 +412,6 @@ footer {
 body.lightmode .historic,
 body.lightmode .toplay {
   color: rgba(3, 21, 33, 0.636) !important;
-}
-.historic {
-  opacity: 0.5;
 }
 
 .historic article,
