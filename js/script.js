@@ -1209,6 +1209,12 @@ function setupAudioEventListeners() {
     const playerButton = document.getElementById("playerButton");
     if (playerButton) playerButton.style.textShadow = "0 0 5px black";
     stopHealthCheck();
+
+    // NIEUW: Verwijder de source zodat de browser stopt met foutief bufferen op de achtergrond
+    if (audio) {
+      audio.removeAttribute("src");
+      audio.load();
+    }
   });
 
   audio.addEventListener("play", () => {
@@ -1283,8 +1289,10 @@ function togglePlay() {
       audio.loop = false;
       audio.muted = false;
       setupAudioEventListeners();
-    } else if (audio.src !== URL_STREAMING) {
+    } else {
+      // BELANGRIJK: Forceer altijd een verse connectie om stale buffers te voorkomen
       audio.src = URL_STREAMING;
+      audio.load();
     }
 
     setVolume(initialVol);
@@ -1338,3 +1346,43 @@ function intToDecimal(vol) {
     initNightshift();
   }
 })();
+
+// Herstel de audio netjes als de app terugkomt op de voorgrond
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    // Als de app UI aangeeft dat hij hoort te spelen:
+    if (audio && isPlayerIconPaused()) {
+      // Controleer of de audio daadwerkelijk stilstaat. Zo niet: blijf er vanaf!
+      if (audio.paused || audio.readyState === 0) {
+        audio.src = URL_STREAMING;
+        audio.load();
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            setPlayerIcon(false);
+          });
+        }
+      }
+    }
+  }
+});
+
+// Spatiebalk voor pauzeren op computers
+document.addEventListener("keydown", (event) => {
+  // Controleer of de ingedrukte toets de spatiebalk is
+  if (event.code === "Space" || event.key === " ") {
+    // Zorg dat je nog wel spaties kunt typen in een inputveld (zoals het wachtwoordscherm)
+    if (
+      document.activeElement.tagName === "INPUT" ||
+      document.activeElement.tagName === "TEXTAREA"
+    ) {
+      return;
+    }
+
+    // Voorkom de standaard browseractie (de pagina naar beneden scrollen)
+    event.preventDefault();
+
+    // Roep de bestaande functie aan
+    togglePlay();
+  }
+});
