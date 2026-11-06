@@ -1090,9 +1090,7 @@ function setCopyright() {
 
   var copy = document.getElementById("copy");
   let jaar = new Date().getFullYear();
-  if (copy)
-    copy.textContent =
-      appName + " " + appVersion + " | ©" + jaar + " " + appAuthor;
+  if (copy) copy.textContent = appName + " " + appVersion + " | © 2024-" + jaar;
 
   const versionInfo = document.getElementById("version-info");
   if (versionInfo) versionInfo.textContent = `v${appVersion}`;
