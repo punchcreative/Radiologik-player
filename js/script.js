@@ -1090,9 +1090,7 @@ function setCopyright() {
 
   var copy = document.getElementById("copy");
   let jaar = new Date().getFullYear();
-  if (copy)
-    copy.textContent =
-      appName + " " + appVersion + " | ©" + jaar + " " + appAuthor;
+  if (copy) copy.textContent = appName + " " + appVersion + " | © 2024-" + jaar;
 
   const versionInfo = document.getElementById("version-info");
   if (versionInfo) versionInfo.textContent = `v${appVersion}`;
@@ -1170,15 +1168,24 @@ function setupAudioEventListeners() {
       bufferingTimeout = null;
     }
 
-    resetButtonState();
+    // Als de gebruiker zelf op pauze had gedrukt, negeer de fout
+    if (userInitiatedPause) return;
 
     if (retryCount < 3) {
       retryCount++;
+      // Probeer na 3 seconden opnieuw in plaats van 10 seconden
       retryTimer = setTimeout(() => {
+        // Cruciaal: Forceer een compleet nieuwe verbinding, niet slechts hervatten
+        audio.src = URL_STREAMING;
+        audio.load();
         const playPromise = audio.play();
-        if (playPromise !== undefined) playPromise.catch((error) => {});
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            resetButtonState();
+          });
+        }
         retryTimer = null;
-      }, 10000);
+      }, 3000);
     } else {
       resetButtonState();
       retryCount = 0;
@@ -1384,5 +1391,21 @@ document.addEventListener("keydown", (event) => {
 
     // Roep de bestaande functie aan
     togglePlay();
+  }
+});
+
+// Luister naar verbroken en herstelde netwerkverbindingen (Wifi <-> 4G)
+window.addEventListener("online", () => {
+  // Als de app weer online komt en de gebruiker had hem niet zelf gepauzeerd:
+  if (!userInitiatedPause && audio) {
+    // Geef de stream 1 seconde om de netwerk-handshake af te ronden en forceer een verse start
+    setTimeout(() => {
+      audio.src = URL_STREAMING;
+      audio.load();
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => setPlayerIcon(false));
+      }
+    }, 1000);
   }
 });

@@ -1,0 +1,54 @@
+{
+  "Last": [
+    {
+      "Artist": "<rl-artist-01>",
+      "Title": "<rl-title-01>",
+      "Duration": "<rl-duration-01>"
+    },
+    {
+      "Artist": "<rl-artist-02>",
+      "Title": "<rl-title-02>",
+      "Duration": "<rl-duration-02>"
+    },
+    {
+      "Artist": "<rl-artist-03>",
+      "Title": "<rl-title-03>",
+      "Duration": "<rl-duration-03>",
+      "Starttime": "<rl-starttime-03>"
+    }
+  ],
+  "Current": {
+    "Artist": "<rl-artist>",
+    "Title": "<rl-title>",
+    "Duration": "<rl-duration-00>",
+    "Starttime": "<rl-starttime>"
+  },
+  "Next": [
+    {
+      "Artist": "<rl-artist+05>",
+      "Title": "<rl-title+05>",
+      "Duration": "<rl-duration+05>"
+    },
+    {
+      "Artist": "<rl-artist+04>",
+      "Title": "<rl-title+04>",
+      "Duration": "<rl-duration+04>"
+    },
+    {
+      "Artist": "<rl-artist+03>",
+      "Title": "<rl-title+03>",
+      "Duration": "<rl-duration+03>"
+    },
+    {
+      "Artist": "<rl-artist+02>",
+      "Title": "<rl-title+02>",
+      "Duration": "<rl-duration+02>"
+    },
+    {
+      "Artist": "<rl-artist+01>",
+      "Title": "<rl-title+01>",
+      "Duration": "<rl-duration+01>",
+      "Starttime": "<rl-starttime+01>"
+    }
+  ]
+}
